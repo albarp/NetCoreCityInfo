@@ -6,6 +6,7 @@ using System.Xml;
 using System.Xml.Linq;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using NetCoreCityInfo.Models;
 
 namespace NetCoreCityInfo.Controllers
@@ -13,18 +14,38 @@ namespace NetCoreCityInfo.Controllers
     [Route("api/cities")]
     public class PointsOfInterestController : Controller
     {
+        private ILogger<PointsOfInterestController> _logger;
+
+        public PointsOfInterestController(ILogger<PointsOfInterestController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet("{cityId}/pointsofinterest")]
         public IActionResult GetPointsOfInterest(int cityId)
         {
-            var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
-
-            if(city == null)
+            try
             {
-                return NotFound();
+                //throw new ApplicationException("Err");
+
+                var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
+
+                if (city == null)
+                {
+                    _logger.LogInformation($"City {cityId} was not found.");
+
+                    return NotFound();
+                }
+
+
+                return Ok(city.PointsOfInterest);
             }
+            catch(Exception ex)
+            {
+                _logger.LogCritical($"Error happend while handling GetPointsOfInterest for city: {cityId}. {ex}");
 
-
-            return Ok(city.PointsOfInterest);
+                return StatusCode(500, "An error happend while handling your request");
+            }
         }
 
         [HttpGet("{cityId}/pointsofinterest/{id}", Name = "GetPointOfInterest")]

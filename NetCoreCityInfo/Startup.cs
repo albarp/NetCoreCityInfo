@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Serialization;
+using NLog.Extensions.Logging;
 
 namespace NetCoreCityInfo
 {
@@ -52,14 +53,24 @@ namespace NetCoreCityInfo
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1
             var logConf = _configuration["Logging:IncludeScopes"];
 
+            // Std logger
             //var logger = loggerFactory.CreateLogger(this.GetType());
             //logger.LogWarning("Warning");
 
+            // Custom static logger
             //ApplicationLogging.ConfigureLogger(loggerFactory);
 
             //var generalLogger = ApplicationLogging.CreateLogger("General");
 
             //generalLogger.LogCritical("from static");
+
+            // Questi due, invece, ce li mette già il default bilder in program.cs
+            //loggerFactory.AddConsole();
+            //loggerFactory.AddDebug();
+
+            // Questo è per aggiungere NLog
+            loggerFactory.AddNLog(new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true });
+            NLog.LogManager.LoadConfiguration("nlog.config");
 
             if (env.IsDevelopment())
             {
