@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NetCoreCityInfo.Services;
 using Newtonsoft.Json.Serialization;
 using NLog.Extensions.Logging;
 
@@ -17,11 +18,12 @@ namespace NetCoreCityInfo
 {
     public class Startup
     {
-        IConfiguration _configuration;
+        // Non mi convince metterlo static, ma in questo modo è raggingibile in tutta l'applicazione
+        public static IConfiguration Configuration { get; private set; }
 
         public Startup(IConfiguration configuration)
         {
-            _configuration = configuration;
+            Configuration = configuration;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -41,6 +43,8 @@ namespace NetCoreCityInfo
                     o.InputFormatters.Add(new XmlDataContractSerializerInputFormatter());
                 })
             ;
+
+            services.AddTransient<IMailService, LocalMailService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,7 +55,7 @@ namespace NetCoreCityInfo
 
             // Logging configuration
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/logging/?view=aspnetcore-2.1
-            var logConf = _configuration["Logging:IncludeScopes"];
+            var logConf = Configuration["Logging:IncludeScopes"];
 
             // Std logger
             //var logger = loggerFactory.CreateLogger(this.GetType());
