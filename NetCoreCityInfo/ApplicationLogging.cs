@@ -15,6 +15,6 @@ namespace NetCoreCityInfo
             _factory = factory;
         }
 
-        public static ILogger CreateLogger(string categoryName) => _factory.CreateLogger(categoryName);
+        public static ILogger<T> CreateLogger<T>() => _factory.CreateLogger<T>();
     }
 }

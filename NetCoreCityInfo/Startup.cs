@@ -45,6 +45,10 @@ namespace NetCoreCityInfo
             ;
 
             services.AddTransient<IMailService, LocalMailService>();
+
+            // If stdoutLogEnabled="true" and stdoutLogFile=".\logs\stdout" in web.config, then
+            // it gets logged
+            Console.WriteLine("ConfigureServices called");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -61,8 +65,7 @@ namespace NetCoreCityInfo
             //var logger = loggerFactory.CreateLogger(this.GetType());
             //logger.LogWarning("Warning");
 
-            // Custom static logger
-            //ApplicationLogging.ConfigureLogger(loggerFactory);
+            
 
             //var generalLogger = ApplicationLogging.CreateLogger("General");
 
@@ -75,6 +78,9 @@ namespace NetCoreCityInfo
             // Questo è per aggiungere NLog
             loggerFactory.AddNLog(new NLogProviderOptions { CaptureMessageTemplates = true, CaptureMessageProperties = true });
             NLog.LogManager.LoadConfiguration("nlog.config");
+
+            // Custom static logger
+            ApplicationLogging.ConfigureLogger(loggerFactory);
 
             if (env.IsDevelopment())
             {
@@ -103,6 +109,10 @@ namespace NetCoreCityInfo
 
             //    await context.Response.WriteAsync(output);
             //});
+
+            // If stdoutLogEnabled="true" and stdoutLogFile=".\logs\stdout" in web.config, then
+            // it gets logged
+            Console.WriteLine("Configure called");
         }
     }
 }
