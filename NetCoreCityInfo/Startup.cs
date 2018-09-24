@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using NetCoreCityInfo.Entities;
 using NetCoreCityInfo.Services;
 using Newtonsoft.Json.Serialization;
 using NLog.Extensions.Logging;
@@ -45,6 +47,12 @@ namespace NetCoreCityInfo
             ;
 
             services.AddTransient<IMailService, LocalMailService>();
+
+
+            var connectionString = @"Server=(localdb)\mssqllocaldb;Database=CityInfoDB;Trusted_Connection=True;";
+
+            // default: scoped
+            services.AddDbContext<CityInfoContext>(o => o.UseSqlServer(connectionString));
 
             // If stdoutLogEnabled="true" and stdoutLogFile=".\logs\stdout" in web.config, then
             // it gets logged
