@@ -48,8 +48,21 @@ namespace NetCoreCityInfo
 
             services.AddTransient<IMailService, LocalMailService>();
 
+            // Per gestire le stringhe di connessione, come altri dati sensibili, si parte dall'ambiente (deciso 
+            // dalla variabile d'ambiente):
+            // 
+            // 1. Development: in questo caso le stringhe di connessione, che puntano a db locali non sensibili, vanno nell'appsettings.json
+            //
+            // 2. Stagin/Production: le stringhe di connessione, che adesso sono sensibili, vanno nelle variabili d'ambiente.
+            //      la variabile d'ambiente si deve chiamare come la chiave utilizzata per recuperare la configurazione
+            //          "connectionStrings:cityInfoDBConnectionString" in questo caso. Il valore, invece, deve essere la stringa di
+            //          connessione (Server=(localdb)\\mssqllocaldb;Database=CityInfoDB;Trusted_Connection=True;)
+            //
+            // In ogni caso il valore si recupera sempre dalla configurazione:
 
-            var connectionString = @"Server=(localdb)\mssqllocaldb;Database=CityInfoDB;Trusted_Connection=True;";
+            var connectionString = Configuration["connectionStrings:cityInfoDBConnectionString"];
+
+            //var connectionString = @"Server=(localdb)\mssqllocaldb;Database=CityInfoDB;Trusted_Connection=True;";
 
             // default: scoped
             services.AddDbContext<CityInfoContext>(o => o.UseSqlServer(connectionString));
@@ -60,7 +73,8 @@ namespace NetCoreCityInfo
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,
+            CityInfoContext cityInfoContext)
         {
             // Env variables
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments?view=aspnetcore-2.1
@@ -99,6 +113,7 @@ namespace NetCoreCityInfo
                 app.UseExceptionHandler();
             }
 
+            cityInfoContext.EnsureSeedDataForContext();
 
             app.UseStatusCodePages();
 

@@ -13,7 +13,9 @@ namespace NetCoreCityInfo.Entities
         {
             // Così crea il db, ma un apparoccio migliore è utilizzare migrate, perchè
             // è in grado di costruire il db applicando tutte le migrazioni (la prima è la creazione del db stesso)
+
             // Database.EnsureCreated();
+
             // Le migrazioni si costruiscono con il comando Add-Migration "nome migrazione" dal lanciare nella
             // Package Manager Cconsole. Ogni volta il tool fa la differenza con le entity precedenti e crea
             // il file di migrazione
