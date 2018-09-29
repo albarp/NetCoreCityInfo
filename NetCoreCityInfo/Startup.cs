@@ -67,6 +67,8 @@ namespace NetCoreCityInfo
             // default: scoped
             services.AddDbContext<CityInfoContext>(o => o.UseSqlServer(connectionString));
 
+            services.AddScoped<ICityInfoRepository, CityInfoRepository>();
+
             // If stdoutLogEnabled="true" and stdoutLogFile=".\logs\stdout" in web.config, then
             // it gets logged
             Console.WriteLine("ConfigureServices called");
