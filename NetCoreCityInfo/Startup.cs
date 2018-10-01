@@ -78,6 +78,14 @@ namespace NetCoreCityInfo
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory,
             CityInfoContext cityInfoContext)
         {
+
+            AutoMapper.Mapper.Initialize(Cfg =>
+            {
+                Cfg.CreateMap<Entities.City, Models.CityWithoutPointOfInterestDto>();
+                Cfg.CreateMap<Entities.City, Models.CityDto>();
+                Cfg.CreateMap<Entities.PointOfInterest, Models.PointOfInterestDto>();
+            });
+
             // Env variables
             // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/environments?view=aspnetcore-2.1
 

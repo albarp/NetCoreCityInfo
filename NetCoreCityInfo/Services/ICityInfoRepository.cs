@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace NetCoreCityInfo.Services
 {
-    interface ICityInfoRepository
+    public interface ICityInfoRepository
     {
         IEnumerable<City> GetCities();
-        City GetCity(int cityId);
+        City GetCity(int cityId, bool includePointOfInterest);
+        bool CityExist(int cityId);
         IEnumerable<PointOfInterest> GetPointsOfInterestForCity(int cityId);
         PointOfInterest GetPointOfInterestForCity(int cityId, int pointOfInterestId);
     }

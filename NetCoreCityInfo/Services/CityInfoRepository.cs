@@ -16,6 +16,11 @@ namespace NetCoreCityInfo.Services
             _context = context;
         }
 
+        public bool CityExist(int cityId)
+        {
+            return _context.Cities.Any(c => c.Id == cityId);
+        }
+
         public IEnumerable<City> GetCities()
         {
             // Chiamare ToList fa eseguire la query vera e propria
@@ -26,7 +31,7 @@ namespace NetCoreCityInfo.Services
         {
             if (includePointOfInterest)
             {
-                return _context.Cities.Include(c => c.PoinOfInterest)
+                return _context.Cities.Include(c => c.PointsOfInterest)
                     .Where(c => c.Id == cityId).FirstOrDefault();
             }
 

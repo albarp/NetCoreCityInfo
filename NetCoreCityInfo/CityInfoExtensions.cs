@@ -21,7 +21,7 @@ namespace NetCoreCityInfo
                 {
                      Name = "New York City",
                      Description = "The one with that big park.",
-                     PoinOfInterest = new List<PointOfInterest>()
+                     PointsOfInterest = new List<PointOfInterest>()
                      {
                          new PointOfInterest() {
                              Name = "Central Park",
@@ -35,7 +35,7 @@ namespace NetCoreCityInfo
                 {
                     Name = "Antwerp",
                     Description = "The one with the cathedral that was never really finished.",
-                    PoinOfInterest = new List<PointOfInterest>()
+                    PointsOfInterest = new List<PointOfInterest>()
                      {
                          new PointOfInterest() {
                              Name = "Cathedral of Our Lady",
@@ -49,7 +49,7 @@ namespace NetCoreCityInfo
                 {
                     Name = "Paris",
                     Description = "The one with that big tower.",
-                    PoinOfInterest = new List<PointOfInterest>()
+                    PointsOfInterest = new List<PointOfInterest>()
                      {
                          new PointOfInterest() {
                              Name = "Eiffel Tower",
