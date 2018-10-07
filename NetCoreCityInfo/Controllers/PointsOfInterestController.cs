@@ -127,29 +127,49 @@ namespace NetCoreCityInfo.Controllers
                 return BadRequest(ModelState);
             }
 
-            var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
+            // In-memory data store
+            //var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
 
-            if(city == null)
+            //if(city == null)
+            //{
+            //    return NotFound();
+            //}
+
+            if (!_cityInfoRepository.CityExist(cityId))
             {
                 return NotFound();
             }
 
-            var maxPointOfInterestId = CitiesDataStore.Current.Cities.SelectMany(
-                c => c.PointsOfInterest).Max(p => p.Id);
+            // In-memory data store
+            //var maxPointOfInterestId = CitiesDataStore.Current.Cities.SelectMany(
+            //    c => c.PointsOfInterest).Max(p => p.Id);
 
-            var finalPointOfInterest = new PointOfInterestDto
+            //var finalPointOfInterest = new PointOfInterestDto
+            //{
+            //    Id = ++maxPointOfInterestId,
+            //    Name = pointOfInterest.Name,
+            //    Description = pointOfInterest.Description
+            //};
+
+            //city.PointsOfInterest.Add(finalPointOfInterest);
+
+            var finalPointOfInterest = AutoMapper.Mapper.Map<Entities.PointOfInterest>(pointOfInterest);
+
+            _cityInfoRepository.AddPointOfInterestForCity(cityId, finalPointOfInterest);
+
+            if (!_cityInfoRepository.Save())
             {
-                Id = ++maxPointOfInterestId,
-                Name = pointOfInterest.Name,
-                Description = pointOfInterest.Description
-            };
+                return StatusCode(500, "A problem happened during save.");
+            }
 
-            city.PointsOfInterest.Add(finalPointOfInterest);
+            // In pratica serve per ottenere l'id che è generato nel save (che poi fa la insert nel db)
+            var createPointOfInterestToReturn = AutoMapper.Mapper.Map<PointOfInterestDto>(finalPointOfInterest);    
 
             // in pratica recupera il route template GetPointOfInterest, che abbiamo definito un paio di metodi prima, e 
             // valorizza i parmetri cityId e id con un oggetto anonimo
             // Infine mette finalPointOfInterest nel body
-            return CreatedAtRoute("GetPointOfInterest", new { cityId, id = finalPointOfInterest.Id }, finalPointOfInterest);
+            return CreatedAtRoute("GetPointOfInterest",
+                new { cityId, id = createPointOfInterestToReturn.Id }, createPointOfInterestToReturn);
         }
 
         // Aggiorna una risorsa

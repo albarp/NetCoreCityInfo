@@ -84,6 +84,7 @@ namespace NetCoreCityInfo
                 Cfg.CreateMap<Entities.City, Models.CityWithoutPointOfInterestDto>();
                 Cfg.CreateMap<Entities.City, Models.CityDto>();
                 Cfg.CreateMap<Entities.PointOfInterest, Models.PointOfInterestDto>();
+                Cfg.CreateMap<Models.PointOfInterestForCreationDto, Entities.PointOfInterest>();
             });
 
             // Env variables

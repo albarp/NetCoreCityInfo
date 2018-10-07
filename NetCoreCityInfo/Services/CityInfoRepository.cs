@@ -16,6 +16,14 @@ namespace NetCoreCityInfo.Services
             _context = context;
         }
 
+        public void AddPointOfInterestForCity(int cityId, PointOfInterest pointOfInterest)
+        {
+            // Vabbè, non mi fa impazzire, controlla che la città ci sia in un altro metodo, quindi questo potrebbe scoppiare
+            var city = GetCity(cityId, false);
+
+            city.PointsOfInterest.Add(pointOfInterest);
+        }
+
         public bool CityExist(int cityId)
         {
             return _context.Cities.Any(c => c.Id == cityId);
@@ -50,6 +58,11 @@ namespace NetCoreCityInfo.Services
         public IEnumerable<PointOfInterest> GetPointsOfInterestForCity(int cityId)
         {
             return _context.PointsOfInterest.Where(p => p.CityId == cityId).ToList();
+        }
+
+        public bool Save()
+        {
+            return _context.SaveChanges() > 0;
         }
     }
 }
