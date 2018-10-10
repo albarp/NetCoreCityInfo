@@ -172,7 +172,7 @@ namespace NetCoreCityInfo.Controllers
                 new { cityId, id = createPointOfInterestToReturn.Id }, createPointOfInterestToReturn);
         }
 
-        // Aggiorna una risorsa
+        // Aggiorna una risorsa --> E' consigliabile, però utilizzare il metodo dopo: partial update
         [HttpPut("{cityId}/pointsofinterest/{id}")]
         public IActionResult UpdatePointOfInterest(int cityId, int id,
             [FromBody] PointOfInterestForUpdateDto pointOfInterest)
@@ -195,22 +195,43 @@ namespace NetCoreCityInfo.Controllers
                 return BadRequest(ModelState);
             }
 
-            var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
+            //var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
 
-            if (city == null)
+            //if (city == null)
+            //{
+            //    return NotFound();
+            //}
+
+            if (!_cityInfoRepository.CityExist(cityId))
             {
                 return NotFound();
             }
 
-            var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(p => p.Id == id);
+            //var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(p => p.Id == id);
 
-            if(pointOfInterestFromStore == null)
+            //if(pointOfInterestFromStore == null)
+            //{
+            //    return NotFound();
+            //}
+
+            var pointOfInterestEntiy = _cityInfoRepository.GetPointOfInterestForCity(cityId, id);
+
+            if(pointOfInterest == null)
             {
                 return NotFound();
             }
 
-            pointOfInterestFromStore.Name = pointOfInterest.Name;
-            pointOfInterestFromStore.Description = pointOfInterest.Description;
+
+            //pointOfInterestFromStore.Name = pointOfInterest.Name;
+            //pointOfInterestFromStore.Description = pointOfInterest.Description;
+
+            AutoMapper.Mapper.Map(pointOfInterest, pointOfInterestEntiy); // modifca la entiy solo in memoria
+
+
+            if (!_cityInfoRepository.Save())
+            {
+                return StatusCode(500, "A problem happened during save.");
+            }
 
             return NoContent();
         }
@@ -225,26 +246,46 @@ namespace NetCoreCityInfo.Controllers
                 return BadRequest();
             }
 
-            var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
+            //var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
 
-            if (city == null)
+            //if (city == null)
+            //{
+            //    return NotFound();
+            //}
+
+            if (!_cityInfoRepository.CityExist(cityId))
             {
                 return NotFound();
             }
 
-            var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(p => p.Id == id);
+            //var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(p => p.Id == id);
 
-            if (pointOfInterestFromStore == null)
+            //if (pointOfInterestFromStore == null)
+            //{
+            //    return NotFound();
+            //}
+
+            var pointOfInterestEntity = _cityInfoRepository.GetPointOfInterestForCity(cityId, id);
+
+            if(pointOfInterestEntity == null)
             {
                 return NotFound();
             }
 
-            var pointOfInterestToPatch =
-                new PointOfInterestForUpdateDto
-                {
-                    Description = pointOfInterestFromStore.Description,
-                    Name = pointOfInterestFromStore.Name
-                };
+            // E' una cosa un po' strana, ma la Patch si può applicare solo ad un  tipo PointOfInterestForUpdateDto,
+            // perchè così è definito il tipo di patchDoc. Quindi dalla Entity si passa al PointOfInterestForUpdateDto, si applica
+            // l'aggiornamento e poi si torna indietro
+
+            //var pointOfInterestToPatch =
+            //    new PointOfInterestForUpdateDto
+            //    {
+            //        Description = pointOfInterestFromStore.Description,
+            //        Name = pointOfInterestFromStore.Name
+            //    };
+
+            var pointOfInterestToPatch = AutoMapper.Mapper.Map<PointOfInterestForUpdateDto>(pointOfInterestEntity);
+
+            //patchDoc.ApplyTo(pointOfInterestToPatch, ModelState);
 
             patchDoc.ApplyTo(pointOfInterestToPatch, ModelState);
 
@@ -269,8 +310,15 @@ namespace NetCoreCityInfo.Controllers
                 return BadRequest(ModelState);
             }
 
-            pointOfInterestFromStore.Name = pointOfInterestToPatch.Name;
-            pointOfInterestFromStore.Description = pointOfInterestToPatch.Description;
+            //pointOfInterestFromStore.Name = pointOfInterestToPatch.Name;
+            //pointOfInterestFromStore.Description = pointOfInterestToPatch.Description;
+
+            AutoMapper.Mapper.Map(pointOfInterestToPatch, pointOfInterestEntity);
+
+            if (!_cityInfoRepository.Save())
+            {
+                return StatusCode(500, "A problem happened during save.");
+            }
 
             return NoContent();
 
@@ -279,24 +327,44 @@ namespace NetCoreCityInfo.Controllers
         [HttpDelete("{cityId}/pointsofinterest/{id}")]
         public IActionResult DeletePointOfInterest(int cityId, int id)
         {
-            var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
+            //var city = CitiesDataStore.Current.Cities.FirstOrDefault(c => c.Id == cityId);
 
-            if (city == null)
+            //if (city == null)
+            //{
+            //    return NotFound();
+            //}
+
+            if (!_cityInfoRepository.CityExist(cityId))
             {
                 return NotFound();
             }
 
-            var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(p => p.Id == id);
 
-            if (pointOfInterestFromStore == null)
+            //var pointOfInterestFromStore = city.PointsOfInterest.FirstOrDefault(p => p.Id == id);
+
+            //if (pointOfInterestFromStore == null)
+            //{
+            //    return NotFound();
+            //}
+
+            var pointOfInterestEntity = _cityInfoRepository.GetPointOfInterestForCity(cityId, id);
+
+            if (pointOfInterestEntity == null)
             {
                 return NotFound();
             }
 
-            city.PointsOfInterest.Remove(pointOfInterestFromStore);
+            //city.PointsOfInterest.Remove(pointOfInterestFromStore);
+
+            _cityInfoRepository.DeletePointOfInterest(pointOfInterestEntity);
+
+            if (!_cityInfoRepository.Save())
+            {
+                return StatusCode(500, "A problem happened during save.");
+            }
 
             _mailService.Send("Point of interest deleted", 
-                $"Point of interest {pointOfInterestFromStore.Name} with id {pointOfInterestFromStore.Id} was deleted." );
+                $"Point of interest {pointOfInterestEntity.Name} with id {pointOfInterestEntity.Id} was deleted." );
 
             return NoContent();
         }

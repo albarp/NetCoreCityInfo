@@ -29,6 +29,11 @@ namespace NetCoreCityInfo.Services
             return _context.Cities.Any(c => c.Id == cityId);
         }
 
+        public void DeletePointOfInterest(PointOfInterest pointOfinterest)
+        {
+            _context.PointsOfInterest.Remove(pointOfinterest);
+        }
+
         public IEnumerable<City> GetCities()
         {
             // Chiamare ToList fa eseguire la query vera e propria
